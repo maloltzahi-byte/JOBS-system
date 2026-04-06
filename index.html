@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>GEMS שלב 4 - שאלה אמיתית</title>
+</head>
+<body style="font-family:Arial;padding:40px">
+
+<h1>שלב 4 - סוג העסקה</h1>
+
+<label>
+  <input type="radio" name="route" value="EMPLOYEE">
+  שכיר
+</label>
+<br>
+<label>
+  <input type="radio" name="route" value="FREELANCER">
+  פרילנסר
+</label>
+
+<br><br>
+
+<button id="runBtn">בדוק ושמור</button>
+
+<p id="status">לא נבדק</p>
+<pre id="result" style="background:#f4f4f4;padding:15px;border:1px solid #ddd;white-space:pre-wrap;min-height:160px;"></pre>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const resultBox = document.getElementById("result")
+const statusBox = document.getElementById("status")
+const button = document.getElementById("runBtn")
+
+function write(text) {
+  resultBox.textContent = text
+  console.log(text)
+}
+
+button.addEventListener("click", async () => {
+  try {
+    const selected = document.querySelector('input[name="route"]:checked')
+
+    if (!selected) {
+      statusBox.innerText = "חסר מידע ❌"
+      write("לא נבחר סוג העסקה.")
+      return
+    }
+
+    const route = selected.value
+    let decision = ""
+
+    if (route === "EMPLOYEE") {
+      decision = "דורש הסכם עבודה"
+    } else if (route === "FREELANCER") {
+      decision = "דורש הסכם שירותים"
+    } else {
+      decision = "לא ידוע"
+    }
+
+    statusBox.innerText = "בודק..."
+    write("סוג העסקה שנבחר: " + route + "\nהחלטה: " + decision + "\nמנסה לשמור ב-contract_sessions...")
+
+    const client = window.supabase.createClient(
+      "https://kbcmkyggqelvydqqrabu.supabase.co",
+      "sb_publishable_0AkdwUYz9TVSJ3KYkO6bFA_sRcDpS-E"
+    )
+
+    const payload = {
+      status: route + " | " + decision
+    }
+
+    const { data, error } = await client
+      .from("contract_sessions")
+      .insert([payload])
+      .select()
+
+    if (error) {
+      statusBox.innerText = "שגיאה ❌"
+      write("שגיאת Supabase:\n" + JSON.stringify(error, null, 2))
+      return
+    }
+
+    statusBox.innerText = "נשמר ✔"
+    write("הצלחה:\n" + JSON.stringify(data, null, 2))
+  } catch (err) {
+    statusBox.innerText = "שגיאה ❌"
+    write("שגיאת JavaScript:\n" + err.message)
+  }
+})
+</script>
+
+</body>
+</html>
