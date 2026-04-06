@@ -197,6 +197,7 @@
 
     const APP = {
       answers: {},
+      touched: false,
       visibleQuestions: [],
       currentIndex: 0,
       sessionId: null,
@@ -224,7 +225,7 @@
       return value;
     }
     function answer(id) { return APP.answers[id]; }
-    function setAnswer(id, value) { APP.answers[id] = normalize(value); logTrace('ANSWER_SET', { id, value: APP.answers[id] }); recalc(); scheduleSave(); }
+    function setAnswer(id, value) { APP.touched = true; APP.answers[id] = normalize(value); logTrace('ANSWER_SET', { id, value: APP.answers[id] }); recalc(); scheduleSave(); }
     function logTrace(type, payload={}) {
       APP.trace.unshift({ type, payload, at: new Date().toISOString() });
       APP.trace = APP.trace.slice(0, 20);
@@ -311,6 +312,9 @@
       let status = 'ALLOW';
 
       if (!route) {
+        if (!APP.touched && !answer('route_profile')) {
+          return { status: 'PENDING', issues: [], route: null };
+        }
         const issue = makeIssue('BLOCK_ROUTE_UNRESOLVED');
         if (issue) { issues.push(issue); status = promote(status, issue.severity); }
       }
@@ -519,7 +523,7 @@
       return getChoices(question).map(opt => {
         const active = String(current) === String(opt.value);
         const extraCls = opt.cls === 'warn' ? 'warn' : '';
-        return `<button class="choice ${active ? 'active' : ''} ${extraCls}" data-question="${question.id}" data-value="${String(opt.value)}"><div><div class="choice-title">${opt.label}</div><div class="choice-sub">${opt.sub || ''}</div></div><div class="tiny">${question.recommendation || ''}</div></button>`;
+        return `<button type="button" class="choice ${active ? 'active' : ''} ${extraCls}" data-question="${question.id}" data-value="${String(opt.value)}"><div><div class="choice-title">${opt.label}</div><div class="choice-sub">${opt.sub || ''}</div></div><div class="tiny">${question.recommendation || ''}</div></button>`;
       }).join('');
     }
     function renderInput(question) {
@@ -538,10 +542,11 @@
     }
     function renderIssues() {
       const issues = APP.gate?.issues || [];
-      byId('issuesList').innerHTML = issues.length ? issues.map(issue => `<div class="item"><strong>${issue.title}</strong><span>${issue.message}</span></div>`).join('') : '<div class="item"><span>אין כרגע חסמים. אפשר להתקדם.</span></div>';
+      const currentStatus = APP.gate?.status || 'ALLOW';
+      byId('issuesList').innerHTML = issues.length ? issues.map(issue => `<div class="item"><strong>${issue.title}</strong><span>${issue.message}</span></div>`).join('') : (currentStatus === 'PENDING' ? '<div class="item"><span>יש לבחור מסלול כדי להתחיל את הבדיקה.</span></div>' : '<div class="item"><span>אין כרגע חסמים. אפשר להתקדם.</span></div>');
       const badge = byId('gateBadge');
-      badge.className = `gate ${APP.gate?.status || 'ALLOW'}`;
-      badge.textContent = APP.gate?.status || 'ALLOW';
+      badge.className = `gate ${currentStatus === 'PENDING' ? 'ALLOW' : currentStatus}`;
+      badge.textContent = currentStatus === 'PENDING' ? 'ממתין לבחירה' : currentStatus;
     }
     function renderQuestionView() {
       const q = APP.visibleQuestions[APP.currentIndex];
@@ -565,16 +570,6 @@
           renderFacts();
         };
       }
-      document.querySelectorAll('[data-question]').forEach(btn => {
-        btn.onclick = () => {
-          setAnswer(btn.dataset.question, btn.dataset.value);
-          hideError();
-          if (APP.currentIndex < APP.visibleQuestions.length - 1) {
-            APP.currentIndex += 1;
-            render();
-          }
-        };
-      });
     }
     function buildAgreementHtml() {
       const summary = agreementSummary();
@@ -617,9 +612,10 @@
       `;
     }
     function renderResultView() {
-      byId('resultGate').className = `gate ${APP.gate?.status || 'ALLOW'}`;
-      byId('resultGate').textContent = APP.gate?.status || 'ALLOW';
-      byId('resultSummary').textContent = APP.gate?.issues?.length ? APP.gate.issues[0].message : 'אין כרגע חסם. אפשר להתקדם לשכבת הפקה מלאה.';
+      const currentStatus = APP.gate?.status || 'ALLOW';
+      byId('resultGate').className = `gate ${currentStatus === 'PENDING' ? 'ALLOW' : currentStatus}`;
+      byId('resultGate').textContent = currentStatus === 'PENDING' ? 'ממתין לבחירה' : currentStatus;
+      byId('resultSummary').textContent = APP.gate?.issues?.length ? APP.gate.issues[0].message : (currentStatus === 'PENDING' ? 'יש לבחור מסלול כדי להפעיל את המנוע.' : 'אין כרגע חסם. אפשר להתקדם לשכבת הפקה מלאה.');
       byId('paper').innerHTML = buildAgreementHtml();
       byId('traceList').innerHTML = APP.trace.length ? APP.trace.map(t => `<div class="item"><strong>${t.type}</strong><span>${new Date(t.at).toLocaleString('he-IL')}</span><span class="mono tiny">${JSON.stringify(t.payload)}</span></div>`).join('') : '<div class="item"><span>אין Trace עדיין.</span></div>';
       byId('sessionIdText').textContent = APP.sessionId || '—';
@@ -650,6 +646,7 @@
     }
     function resetAll() {
       APP.answers = {};
+      APP.touched = false;
       APP.currentIndex = 0;
       APP.resultMode = false;
       APP.trace = [];
@@ -675,6 +672,16 @@
     byId('backToQuestionsBtn').onclick = () => { APP.resultMode = false; render(); };
     byId('adminToggleBtn').onclick = () => { APP.resultMode = !APP.resultMode; render(); };
     byId('resetBtn').onclick = resetAll;
+    byId('choiceGrid').addEventListener('click', (event) => {
+      const btn = event.target.closest('[data-question]');
+      if (!btn) return;
+      setAnswer(btn.dataset.question, btn.dataset.value);
+      hideError();
+      if (!APP.resultMode && APP.currentIndex < APP.visibleQuestions.length - 1) {
+        APP.currentIndex += 1;
+      }
+      render();
+    });
     byId('saveSnapshotBtn').onclick = () => saveSessionProgress(true);
 
     init();
