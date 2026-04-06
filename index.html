@@ -226,6 +226,28 @@
     }
     function answer(id) { return APP.answers[id]; }
     function setAnswer(id, value) { APP.touched = true; APP.answers[id] = normalize(value); logTrace('ANSWER_SET', { id, value: APP.answers[id] }); recalc(); scheduleSave(); }
+    document.addEventListener("click", function(e) {
+      const el = e.target.closest(".choice");
+      if (!el) return;
+      const questionId = el.dataset.question;
+      if (!questionId) return;
+      let value = el.dataset.value;
+      if (value === "true") value = true;
+      else if (value === "false") value = false;
+      setAnswer(questionId, value);
+      const q = questionMap.get(questionId);
+      if (q && (q.type === 'choice' || q.type === 'boolean')) {
+        setTimeout(() => {
+          APP.visibleQuestions = computeVisibleQuestions();
+          const currentVisible = APP.visibleQuestions[APP.currentIndex];
+          if (currentVisible && currentVisible.id === questionId && APP.currentIndex < APP.visibleQuestions.length - 1) {
+            APP.currentIndex += 1;
+            render();
+          }
+        }, 30);
+      }
+    });
+
     function logTrace(type, payload={}) {
       APP.trace.unshift({ type, payload, at: new Date().toISOString() });
       APP.trace = APP.trace.slice(0, 20);
