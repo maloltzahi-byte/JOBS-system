@@ -1,702 +1,925 @@
-
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>GEMS Master v1.17.7 INPUT FIXED</title>
+<title>GEMS Master v1.19.1 - UI LOCKED</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#f5f5f7; --panel:#fff; --text:#1d1d1f; --muted:#6e6e73; --line:#e5e5ea;
-    --blue:#0071e3; --blue-soft:#eef6ff; --green:#16a34a; --green-soft:#edfdf3;
-    --orange:#f97316; --orange-soft:#fff7ed; --red:#dc2626; --red-soft:#fef2f2;
-    --yellow:#ca8a04; --yellow-soft:#fefce8;
-    --shadow:0 16px 40px rgba(0,0,0,.08); --paper-shadow:0 30px 90px rgba(0,0,0,.06);
-    --radius-lg:18px; --radius-xl:24px; --radius-pill:999px;
+  :root {
+    --bg: #f5f5f7;
+    --panel: #ffffff;
+    --panel-soft: #fafafc;
+    --text: #1d1d1f;
+    --muted: #6e6e73;
+    --line: #e5e5ea;
+    --blue: #0071e3;
+    --blue-soft: #eef6ff;
+    --green: #2ea043;
+    --green-soft: #ebf8ee;
+    --orange: #ff9f0a;
+    --orange-soft: #fff6e8;
+    --red: #d92d20;
+    --red-soft: #fff1f0;
+    --shadow: 0 12px 36px rgba(0,0,0,.06);
+    --radius: 16px;
+    --radius-sm: 12px;
+    --header-h: 68px;
+    --footer-h: 94px;
   }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; font-family:'Assistant',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); overflow:hidden;
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: 'Assistant', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
   }
-  .app{display:flex;height:100vh}
-  .cockpit{
-    width:420px; background:rgba(255,255,255,.9); backdrop-filter:blur(20px); border-left:1px solid var(--line);
-    box-shadow:var(--shadow); display:flex; flex-direction:column; z-index:5;
+  .app {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 430px 1fr;
+    overflow: hidden;
   }
-  .cockpit-head{padding:28px 28px 20px;border-bottom:1px solid var(--line)}
-  .brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-  .logo{
-    width:36px;height:36px;border-radius:12px;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;
-    font-weight:800;font-size:17px;letter-spacing:-.03em;
+  .left {
+    background: var(--panel);
+    border-left: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-rows: var(--header-h) 1fr var(--footer-h);
+    min-width: 0;
+    min-height: 0;
   }
-  .chips{display:flex;gap:8px;flex-wrap:wrap}
-  .chip{padding:5px 10px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-  .chip.live{background:#dcfce7;color:#166534}
-  .chip.ver{background:#dbeafe;color:#1d4ed8}
-  .cockpit h1{margin:0;font-size:28px;letter-spacing:-.03em;line-height:1.05}
-  .cockpit-sub{margin-top:6px;color:#8b8b90;font-size:10px;font-weight:800;letter-spacing:.22em;text-transform:uppercase}
-  .cockpit-body{padding:24px 28px;overflow:auto;flex:1}
-  .step-meta{font-size:10px;color:var(--blue);font-weight:800;letter-spacing:.22em;text-transform:uppercase}
-  .step-title{margin:8px 0 16px;font-size:30px;line-height:1.08;letter-spacing:-.04em}
-  .field-box{min-height:180px}
-  .field-help{margin-top:10px;font-size:13px;color:var(--muted);line-height:1.6}
-  .input,.num-input{
-    width:100%;border:1px solid var(--line);outline:none;background:#fafafa;color:var(--text);border-radius:16px;
-    padding:16px 18px;font-family:inherit;font-weight:700;transition:.18s ease;font-size:16px;
+  .left-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,.88);
+    backdrop-filter: blur(10px);
   }
-  .input:focus,.num-input:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(0,113,227,.08)}
-  .route-grid,.binary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .route-btn,.pill-toggle{
-    border:1px solid var(--line);border-radius:16px;padding:15px 12px;background:#f7f7f8;color:#111827;cursor:pointer;font-family:inherit;
-    font-weight:800;font-size:15px;line-height:1.3;transition:.16s ease;text-align:center;
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
-  .route-btn:hover,.pill-toggle:hover{transform:translateY(-1px);background:#f0f1f4}
-  .route-btn.active,.pill-toggle.active{background:#111;color:#fff;border-color:#111;box-shadow:0 10px 24px rgba(0,0,0,.12)}
-  .range-wrap{background:#f8f8fa;border:1px solid var(--line);border-radius:16px;padding:16px}
-  .range-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-  .range-val{font-weight:800;font-size:20px}
-  input[type=range]{width:100%}
-  .validation-box{
-    margin-top:14px;padding:14px 16px;border-radius:16px;background:var(--red-soft);border:1px solid #fecaca;color:#991b1b;font-size:13px;font-weight:700;display:none;
+  .brand strong { font-size: 20px; font-weight: 800; }
+  .brand span { font-size: 11px; color: var(--muted); font-weight: 700; }
+  .ver {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #f1f2f4;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 700;
+    white-space: nowrap;
   }
-  .validation-box.show{display:block}
-  .trace-box{
-    margin-top:18px;background:#fafafa;border:1px solid var(--line);border-radius:18px;padding:14px 16px;
+  .left-body {
+    padding: 24px 22px 18px;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 14px;
+    min-height: 0;
   }
-  .trace-k{font-size:10px;color:#9ca3af;font-weight:800;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px}
-  .trace-main{font-size:14px;font-weight:800}
-  .trace-mini{margin-top:6px;font-size:13px;color:#6b7280;line-height:1.55}
-  .nav-row{display:flex;justify-content:space-between;align-items:center;padding-top:18px}
-  .nav-btn{
-    width:52px;height:52px;border-radius:50%;border:0;cursor:pointer;font-size:24px;font-weight:800;transition:.18s ease
+  .step-meta {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--blue);
+    letter-spacing: .08em;
   }
-  .nav-btn.prev{background:#f0f1f4;color:#6b7280}
-  .nav-btn.next{background:var(--blue);color:#fff;box-shadow:0 12px 24px rgba(0,113,227,.22)}
-  .nav-btn:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
-  .dots{display:flex;gap:8px}
-  .dotbar{height:6px;border-radius:999px;background:#e5e7eb;transition:.22s ease}
-  .dotbar.active{width:34px;background:var(--blue)}
-  .dotbar:not(.active){width:6px}
-  .cockpit-foot{padding:20px 28px;border-top:1px solid var(--line);background:rgba(248,248,250,.8)}
-  .release-btn{
-    width:100%;border:0;border-radius:18px;padding:16px 18px;font-family:inherit;font-size:19px;font-weight:800;
-    display:flex;align-items:center;justify-content:center;transition:.18s ease;cursor:pointer;
+  .step-title {
+    margin: 0;
+    font-size: 32px;
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -.03em;
+    min-height: 70px;
   }
-  .release-btn.allow{background:#111;color:#fff}
-  .release-btn.review{background:var(--orange);color:#fff}
-  .release-btn.block{background:#e5e7eb;color:#8b8b90;cursor:not-allowed}
+  .field-area {
+    min-height: 0;
+    display: flex;
+    align-items: flex-start;
+  }
+  .field-stack {
+    width: 100%;
+    display: grid;
+    gap: 12px;
+    align-content: start;
+  }
+  .hint {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.45;
+    min-height: 20px;
+  }
+  .text-input, .num-input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 600;
+    transition: .18s ease;
+  }
+  .text-input:focus, .num-input:focus {
+    outline: none;
+    border-color: var(--blue);
+    background: var(--panel);
+    box-shadow: 0 0 0 4px rgba(0,113,227,.12);
+  }
+  .choice-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .choice-grid.two { grid-template-columns: 1fr 1fr; }
+  .choice-btn, .binary-btn {
+    border: 1px solid var(--line);
+    background: var(--panel-soft);
+    border-radius: 14px;
+    color: var(--text);
+    cursor: pointer;
+    transition: .18s ease;
+    font-family: inherit;
+    font-weight: 700;
+  }
+  .choice-btn {
+    padding: 14px 14px;
+    min-height: 58px;
+    font-size: 15px;
+    text-align: right;
+  }
+  .binary-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .binary-btn { padding: 14px 12px; font-size: 15px; min-height: 54px; }
+  .choice-btn:hover, .binary-btn:hover { background: #f0f3f7; }
+  .choice-btn.active, .binary-btn.active {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff;
+  }
+  .validation {
+    min-height: 18px;
+    font-size: 12px;
+    color: var(--red);
+    font-weight: 700;
+  }
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .nav-btn {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: .18s ease;
+    min-width: 104px;
+  }
+  .nav-btn.prev { background: #ececf1; color: var(--text); }
+  .nav-btn.next { background: var(--blue); color: #fff; }
+  .nav-btn:disabled { opacity: .4; cursor: not-allowed; }
+  .dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #d7d7dc;
+    transition: .18s ease;
+  }
+  .dot.active {
+    width: 24px;
+    background: var(--blue);
+  }
+  .left-foot {
+    border-top: 1px solid var(--line);
+    padding: 16px 22px;
+    background: #fafafa;
+    display: grid;
+    gap: 10px;
+    align-content: center;
+  }
+  .action-btn {
+    width: 100%;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+    transition: .18s ease;
+    cursor: pointer;
+  }
+  .action-btn.allow { background: #111; }
+  .action-btn.review { background: var(--orange); }
+  .action-btn.block { background: #b7b7be; cursor: not-allowed; }
+  .gate-help {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.35;
+    min-height: 16px;
+  }
 
-  .main{flex:1;display:flex;flex-direction:column;min-width:0}
-  .topbar{
-    height:88px;background:rgba(255,255,255,.78);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);
-    padding:0 36px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0
+  .right {
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: var(--header-h) 1fr;
+    overflow: hidden;
   }
-  .top-left{display:flex;align-items:center;gap:28px}
-  .meta-block{display:flex;flex-direction:column}
-  .meta-k{font-size:10px;color:#9ca3af;font-weight:800;letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px}
-  .gate-row{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
-  .gate-light{width:14px;height:14px;border-radius:50%}
-  .gate-allow{background:#22c55e}.gate-block{background:#ef4444}.gate-review{background:#f97316}.gate-fix{background:#eab308}.gate-init{background:#d1d5db}
-  .hash-box{
-    display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 14px;
-    box-shadow:0 4px 12px rgba(0,0,0,.04)
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,.84);
+    backdrop-filter: blur(10px);
   }
-  .hash-box span:last-child{
-    font-size:11px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:800;color:#4b5563
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .runtime { color: var(--blue); font-weight: 800; }
+  .badge {
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .04em;
+  }
+  .badge.INIT { background: #f1f2f4; color: #6e6e73; }
+  .badge.ALLOW { background: var(--green-soft); color: #1d7b36; }
+  .badge.BLOCK { background: var(--red-soft); color: var(--red); }
+  .badge.FIX_REQUIRED { background: #eef6ff; color: var(--blue); }
+  .badge.REVIEW { background: var(--orange-soft); color: #b86a00; }
+
+  .workspace {
+    padding: 18px 18px 18px 22px;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 14px;
+    overflow: hidden;
+  }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 14px;
+    min-height: 0;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    min-width: 0;
+  }
+  .card-head {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--muted);
+    letter-spacing: .05em;
+  }
+  .card-body { padding: 14px 16px; }
+  .card.compact .card-body { padding: 12px 14px; }
+
+  .issues-list {
+    display: grid;
+    gap: 10px;
+    max-height: 184px;
+    overflow: hidden;
+  }
+  .issue {
+    border-radius: 12px;
+    padding: 12px 12px;
+    border: 1px solid transparent;
+    display: grid;
+    gap: 6px;
+  }
+  .issue.BLOCK { background: var(--red-soft); border-color: #ffd1cc; }
+  .issue.FIX { background: var(--blue-soft); border-color: #cfe5ff; }
+  .issue.REVIEW { background: var(--orange-soft); border-color: #ffe3b0; }
+  .issue-title {
+    font-size: 14px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .issue-summary {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  .issue-resolution {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .ok-box {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--green-soft);
+    border-radius: 12px;
+    color: #1d7b36;
+    font-weight: 800;
+    min-height: 124px;
   }
 
-  .canvas{flex:1;overflow:auto;padding:40px;background:var(--bg)}
-  .canvas-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start;max-width:1400px;margin:0 auto}
-  .paper{
-    background:#fff;min-height:960px;padding:80px 84px;border-radius:2px;box-shadow:var(--paper-shadow)
+  .state-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
-  .contract-title{text-align:center;font-size:48px;font-weight:800;margin:0 0 52px;letter-spacing:-.04em;text-decoration:underline;text-decoration-color:var(--blue);text-decoration-thickness:5px;text-underline-offset:18px}
-  .clauses{display:flex;flex-direction:column;gap:16px;font-size:18px;line-height:1.85;text-align:justify}
-  .clause{padding:18px 20px;border-radius:18px;background:#fafafa;border-right:5px solid transparent;transition:.16s ease}
-  .clause:hover{border-right-color:var(--blue)}
-  strong.hl{font-weight:800;color:#000;text-decoration:underline;text-decoration-thickness:1.5px}
-  strong.money{font-weight:800;color:var(--blue)}
-  .ghost{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:720px;text-align:center;color:#9ca3af}
-  .ghost-icon{font-size:72px;margin-bottom:16px}
-  .ghost h2{margin:0;font-size:34px;letter-spacing:-.03em;color:#3f3f46}
-  .ghost p{margin:10px 0 0;max-width:460px;line-height:1.8;font-size:16px}
-  .right-rail{display:grid;gap:18px}
-  .card{
-    background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 8px 22px rgba(0,0,0,.04)
+  .kv {
+    background: var(--panel-soft);
+    border-radius: 12px;
+    padding: 10px 12px;
+    min-height: 58px;
   }
-  .card h3{margin:0 0 12px;font-size:16px;letter-spacing:-.02em}
-  .state-grid{display:grid;gap:10px}
-  .state-item{padding:12px 14px;background:#fafafa;border:1px solid #eee;border-radius:14px}
-  .state-item .k{font-size:11px;color:#8b8b90;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
-  .state-item .v{font-size:14px;font-weight:700;line-height:1.5}
-  .issue{
-    border:1px solid transparent;border-radius:16px;padding:12px 14px;margin-bottom:10px
+  .kv .k {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 800;
+    margin-bottom: 4px;
   }
-  .issue.review{border-color:#fed7aa;background:var(--orange-soft)}
-  .issue.fix{border-color:#fde68a;background:var(--yellow-soft)}
-  .issue.block{border-color:#fecaca;background:var(--red-soft)}
-  .issue-meta{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
-  .issue p{margin:6px 0 0;font-size:13px;font-weight:700;line-height:1.55}
-  .guidance{
-    margin-top:10px;padding:12px 14px;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0;font-size:13px;line-height:1.7;font-weight:700
+  .kv .v {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    word-break: break-word;
   }
-  .safe{
-    padding:12px 14px;border-radius:16px;background:var(--green-soft);border:1px solid #bbf7d0;color:#166534;font-weight:800;font-size:13px
+
+  .preview {
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto 1fr;
   }
-  .schema-list{display:grid;gap:8px}
-  .schema-pill{
-    padding:10px 12px;border-radius:999px;background:#eff6ff;border:1px solid #dbeafe;color:#1d4ed8;font-size:12px;font-weight:800
+  .preview-body {
+    padding: 20px 22px;
+    overflow: hidden;
+    min-height: 0;
   }
-  @media (max-width:1180px){
-    .app{display:block;height:auto}
-    body{overflow:auto}
-    .cockpit{width:100%;border-left:0;border-bottom:1px solid var(--line)}
-    .topbar{padding:0 20px}
-    .canvas-grid{grid-template-columns:1fr}
-    .paper{padding:40px 28px}
+  .doc-title {
+    text-align: center;
+    margin: 0 0 18px;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -.03em;
   }
-  @media print{
-    .cockpit,.topbar,.right-rail,.nav-row,.cockpit-foot{display:none!important}
-    .app,.main{display:block!important}
-    .canvas{padding:0!important;overflow:visible!important}
-    .paper{box-shadow:none!important}
-    body{overflow:visible!important}
+  .clauses {
+    display: grid;
+    gap: 10px;
+  }
+  .clause {
+    font-size: 14px;
+    line-height: 1.45;
+    background: var(--panel-soft);
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+  .hl { color: var(--blue); font-weight: 800; }
+  .empty {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--muted);
+    gap: 10px;
+  }
+  .empty strong {
+    color: var(--text);
+    font-size: 20px;
+    font-weight: 800;
+  }
+  .empty p {
+    margin: 0;
+    max-width: 540px;
+    line-height: 1.45;
+    font-size: 14px;
+  }
+
+  @media (max-width: 1200px) {
+    .app { grid-template-columns: 400px 1fr; }
+    .step-title { font-size: 28px; }
+    .doc-title { font-size: 24px; }
   }
 </style>
 </head>
 <body>
 <div class="app">
-  <aside class="cockpit">
-    <div class="cockpit-head">
+  <aside class="left">
+    <div class="left-head">
       <div class="brand">
-        <div class="logo">G</div>
-        <div class="chips">
-          <span class="chip live">Locked</span>
-          <span class="chip ver">v1.17.7</span>
+        <strong>GEMS</strong>
+        <span>UI LOCKED · ללא גלילה</span>
+      </div>
+      <div class="ver">v1.19.1</div>
+    </div>
+
+    <div class="left-body">
+      <div class="step-meta" id="stepMeta">שלב 1</div>
+      <h1 class="step-title" id="stepTitle">טוען…</h1>
+      <div class="field-area">
+        <div class="field-stack">
+          <div id="fieldBox"></div>
+          <div class="hint" id="fieldHint"></div>
+          <div class="validation" id="validationMsg"></div>
         </div>
       </div>
-      <h1>GEMS Cockpit</h1>
-      <div class="cockpit-sub">Final Lock · Production Gate</div>
-    </div>
-    <div class="cockpit-body">
-      <div class="step-wrap">
-        <div class="step-meta" id="stepMeta">Step 1</div>
-        <div class="step-title" id="stepTitle">טוען...</div>
-        <div class="field-box" id="fieldBox"></div>
-        <div class="field-help" id="fieldHelp"></div>
-        <div class="validation-box" id="validationBox"></div>
-        <div class="trace-box">
-          <div class="trace-k">Engine Trace</div>
-          <div class="trace-main" id="traceMain">INIT</div>
-          <div class="trace-mini" id="traceMini">בחר מסלול כדי להתחיל.</div>
-        </div>
-        <div class="nav-row">
-          <button class="nav-btn prev" id="prevBtn">‹</button>
-          <div class="dots" id="dots"></div>
-          <button class="nav-btn next" id="nextBtn">›</button>
-        </div>
+      <div class="nav-row">
+        <button class="nav-btn prev" id="prevBtn">הקודם</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn next" id="nextBtn">הבא</button>
       </div>
     </div>
-    <div class="cockpit-foot">
-      <button class="release-btn block" id="releaseBtn" disabled>ממתין לנתונים</button>
+
+    <div class="left-foot">
+      <button class="action-btn block" id="releaseBtn" disabled>ממתין לנתונים</button>
+      <div class="gate-help" id="gateHelp">המנוע הקנוני יכריע אחרי השלמת נתוני הליבה.</div>
     </div>
   </aside>
 
-  <main class="main">
-    <nav class="topbar">
-      <div class="top-left">
-        <div class="meta-block">
-          <div class="meta-k">Decision Gate</div>
-          <div class="gate-row"><span class="gate-light gate-init" id="gateLight"></span><span id="gateText">INIT</span></div>
+  <main class="right">
+    <div class="topbar">
+      <div class="topbar-left">GEMS <span class="runtime">@gems/legal-engine runtime</span></div>
+      <div class="badge INIT" id="gateBadge">INIT</div>
+    </div>
+
+    <section class="workspace">
+      <div class="summary-grid">
+        <div class="card compact">
+          <div class="card-head">LEGAL MATRIX / ISSUE REGISTRY</div>
+          <div class="card-body" id="issuesWrap"></div>
+        </div>
+        <div class="card compact">
+          <div class="card-head">STATE SNAPSHOT</div>
+          <div class="card-body" id="stateWrap"></div>
         </div>
       </div>
-      <div class="hash-box"><span>#</span><span id="hashText">GEMS_LOCK_INIT</span></div>
-    </nav>
 
-    <section class="canvas">
-      <div class="canvas-grid">
-        <div class="paper" id="paper"></div>
-
-        <div class="right-rail">
-          <div class="card">
-            <h3>מצב פנימי</h3>
-            <div class="state-grid" id="stateBox"></div>
-          </div>
-
-          <div class="card">
-            <h3>Logic Flags</h3>
-            <div id="issuesBox"></div>
-            <div id="guidanceBox"></div>
-          </div>
-
-          <div class="card">
-            <h3>Contract Schema</h3>
-            <div class="schema-list" id="schemaBox"></div>
-          </div>
-        </div>
+      <div class="card preview">
+        <div class="card-head">CONTRACT PREVIEW</div>
+        <div class="preview-body" id="paperContainer"></div>
       </div>
     </section>
   </main>
 </div>
 
 <script>
-const SYSTEM_CONSTANTS = {
-  MIN_WAGE_MONTHLY: 6443.85,
-  MIN_WAGE_HOURLY: 33.49
+const CalculationEngine = {
+  calculateRelativeMinimumWage: (scopePercent) => Number((6443.85 * (scopePercent / 100)).toFixed(2)),
+  calculateHourlyMinimum: () => 33.49
 };
 
-const CLAUSE_REGISTRY = {
-  TITLE: "הסכם העסקה אישי",
-  PREAMBLE: "הואיל והמעסיק מעוניין להעסיק את העובד והעובד מסכים לכך, הכל בתנאים המפורטים להלן.",
-  PARTIES: 'הסכם זה נערך ונחתם ביום {{date}} בין החברה בע"מ לבין {{name}}.',
-  POSITION_EMPLOYEE: 'העובד יועסק בתפקיד {{jobTitle}} בהיקף משרה של {{scope}}%.',
-  POSITION_CONTRACTOR: 'הקבלן יספק לחברה שירותי {{jobTitle}} כקבלן עצמאי ובלתי תלוי.',
-  WAGE_MONTHLY: 'תמורת ביצוע עבודתו, ישלם המעסיק שכר יסוד חודשי ברוטו בסך {{salary}} ₪.',
-  WAGE_HOURLY: 'תמורת ביצוע עבודתו בפועל, ישלם המעסיק שכר שעתי בסך {{salary}} ₪.',
-  OVERTIME_GLOBAL: 'לאור אופי התפקיד, תשולם לעובד תוספת גלובלית בגין שעות נוספות, בכפוף לדין.',
-  TRUST_CLAUSE: 'משרת העובד הינה משרת אמון כמשמעותה בסעיף 30(א)(5) לחוק שעות עבודה ומנוחה.',
-  PENSION_MANDATORY: 'המעסיק יבטח את העובד בביטוח פנסיוני מקיף כקבוע בדין.',
-  SEC_14: 'על הפרשות המעסיק יחולו הוראות סעיף 14 לחוק פיצויי פיטורים.',
-  CONFIDENTIALITY: 'העובד מתחייב לשמור בסודיות מוחלטת מידע וסודות מסחריים של החברה.',
-  IP_ASSIGNMENT: 'זכויות הקניין הרוחני הנוצרות על ידי העובד שייכות בלעדית לחברה.',
-  NON_COMPETE: 'העובד מתחייב שלא להתחרות בעסקי החברה למשך 12 חודשים מסיום העסקתו.'
+const ISSUE_REGISTRY_V2 = {
+  issues: [
+    {
+      id: "ISSUE_MIN_WAGE_UNDERPAY",
+      title: "שכר נמוך מהמינימום היחסי",
+      domain: "Wages",
+      severity: "BLOCK",
+      summary: "השכר המוצע נמוך מהרף הקוגנטי הנדרש על פי חוק.",
+      resolution_path: "יש לתקן את שכר הבסיס או את היקף המשרה המוגדר."
+    },
+    {
+      id: "ISSUE_PENSION_MISSING",
+      title: "חסרה הגדרת פנסיה",
+      domain: "Pension",
+      severity: "FIX",
+      summary: "במסלול עובד לא הוגדרה זכאות לפנסיה חובה.",
+      resolution_path: "חובה להפעיל את הגדרת הפנסיה כדי להתקדם."
+    },
+    {
+      id: "ISSUE_CONTRACTOR_MISCLASSIFICATION",
+      title: "סכנת סיווג יחסי עובד-מעסיק",
+      domain: "Classification",
+      severity: "REVIEW",
+      summary: "התקשרות עם קבלן בהיקף 100% מעלה חשש כבד להכרה בו כעובד.",
+      resolution_path: "נדרשת בחינה משפטית של עורך דין לאישור מתווה זה."
+    },
+    {
+      id: "ISSUE_HOURLY_GLOBAL_CONFLICT",
+      title: "מודל שעות נוספות שגוי",
+      domain: "Hours",
+      severity: "BLOCK",
+      summary: "לא ניתן להחיל תמורת שעות נוספות גלובלית על עובד שעתי.",
+      resolution_path: "יש לשנות את מודל השעות הנוספות ל'לפי חוק (בפועל)'."
+    }
+  ]
 };
 
-const CLAUSE_DEPENDENCY_MAP = {
-  routes: {
-    MONTHLY: { mandatory: ['PREAMBLE','PARTIES','POSITION_EMPLOYEE','WAGE_MONTHLY','PENSION_MANDATORY'], optional: ['OVERTIME_GLOBAL','SEC_14','IP_ASSIGNMENT','CONFIDENTIALITY','NON_COMPETE'] },
-    HOURLY: { mandatory: ['PREAMBLE','PARTIES','POSITION_EMPLOYEE','WAGE_HOURLY','PENSION_MANDATORY'], optional: ['SEC_14','IP_ASSIGNMENT','CONFIDENTIALITY','NON_COMPETE'] },
-    EXECUTIVE: { mandatory: ['PREAMBLE','PARTIES','POSITION_EMPLOYEE','WAGE_MONTHLY','TRUST_CLAUSE','PENSION_MANDATORY'], optional: ['OVERTIME_GLOBAL','SEC_14','IP_ASSIGNMENT','CONFIDENTIALITY','NON_COMPETE'] },
-    CONTRACTOR: { mandatory: ['PREAMBLE','PARTIES','POSITION_CONTRACTOR','WAGE_HOURLY'], optional: ['IP_ASSIGNMENT','CONFIDENTIALITY','NON_COMPETE'] }
+const LEGAL_MATRIX_V2 = {
+  rules: [
+    {
+      id: "RULE_MIN_WAGE_PRO_RATA",
+      route_scope: ["MONTHLY", "EXECUTIVE"],
+      required_fields: ["compensation.salary", "employment.scopePercent"],
+      applies_if: (state) => true,
+      condition: (state) => state.compensation.salary < CalculationEngine.calculateRelativeMinimumWage(state.employment.scopePercent),
+      actions: [{ type: "ADD_ISSUE", target: "ISSUE_MIN_WAGE_UNDERPAY" }]
+    },
+    {
+      id: "RULE_HOURLY_MIN_WAGE",
+      route_scope: ["HOURLY", "CONTRACTOR"],
+      required_fields: ["compensation.salary"],
+      applies_if: (state) => true,
+      condition: (state) => state.compensation.salary < CalculationEngine.calculateHourlyMinimum(),
+      actions: [{ type: "ADD_ISSUE", target: "ISSUE_MIN_WAGE_UNDERPAY" }]
+    },
+    {
+      id: "RULE_PENSION_REQUIRED",
+      route_scope: ["MONTHLY", "HOURLY", "EXECUTIVE"],
+      required_fields: ["social.pensionEnabled"],
+      applies_if: (state) => true,
+      condition: (state) => state.social.pensionEnabled === false,
+      actions: [{ type: "ADD_ISSUE", target: "ISSUE_PENSION_MISSING" }]
+    },
+    {
+      id: "RULE_CONTRACTOR_FULL_SCOPE",
+      route_scope: ["CONTRACTOR"],
+      required_fields: ["employment.scopePercent"],
+      applies_if: (state) => true,
+      condition: (state) => state.employment.scopePercent >= 100,
+      actions: [{ type: "ADD_ISSUE", target: "ISSUE_CONTRACTOR_MISCLASSIFICATION" }]
+    },
+    {
+      id: "RULE_GLOBAL_OVERTIME_HOURLY",
+      route_scope: ["HOURLY"],
+      required_fields: ["hours.overtimeModel"],
+      applies_if: (state) => true,
+      condition: (state) => state.hours.overtimeModel === "GLOBAL",
+      actions: [{ type: "ADD_ISSUE", target: "ISSUE_HOURLY_GLOBAL_CONFLICT" }]
+    },
+    {
+      id: "CLAUSE_ASSEMBLY_ROUTING",
+      route_scope: ["MONTHLY", "HOURLY", "EXECUTIVE", "CONTRACTOR"],
+      required_fields: [],
+      applies_if: (state) => true,
+      condition: (state) => true,
+      actions: [
+        { type: "ADD_CLAUSE", target: "PREAMBLE" },
+        { type: "ADD_CLAUSE", target: "PARTIES" },
+        { type: "ADD_CLAUSE", target: "POSITION_DYNAMIC" },
+        { type: "ADD_CLAUSE", target: "WAGE_DYNAMIC" }
+      ]
+    },
+    {
+      id: "CLAUSE_PENSION_MANDATORY",
+      route_scope: ["MONTHLY", "HOURLY", "EXECUTIVE"],
+      required_fields: ["social.pensionEnabled"],
+      applies_if: (state) => state.social.pensionEnabled === true,
+      condition: (state) => true,
+      actions: [{ type: "ADD_CLAUSE", target: "PENSION_MANDATORY" }]
+    },
+    {
+      id: "CLAUSE_SEC14",
+      route_scope: ["MONTHLY", "EXECUTIVE"],
+      required_fields: ["social.applySec14"],
+      applies_if: (state) => state.social.applySec14 === true,
+      condition: (state) => true,
+      actions: [{ type: "ADD_CLAUSE", target: "SEC_14" }]
+    },
+    {
+      id: "CLAUSE_GLOBAL_OVERTIME",
+      route_scope: ["MONTHLY", "EXECUTIVE"],
+      required_fields: ["hours.overtimeModel"],
+      applies_if: (state) => state.hours.overtimeModel === "GLOBAL",
+      condition: (state) => true,
+      actions: [{ type: "ADD_CLAUSE", target: "OVERTIME_GLOBAL" }]
+    },
+    {
+      id: "CLAUSE_TRUST",
+      route_scope: ["EXECUTIVE"],
+      required_fields: [],
+      applies_if: (state) => true,
+      condition: (state) => true,
+      actions: [{ type: "ADD_CLAUSE", target: "TRUST_CLAUSE" }]
+    }
+  ]
+};
+
+function resolveGateStatus(severities) {
+  if (severities.includes('BLOCK')) return 'BLOCK';
+  if (severities.includes('FIX_REQUIRED') || severities.includes('FIX')) return 'FIX_REQUIRED';
+  if (severities.includes('REVIEW_REQUIRED') || severities.includes('REVIEW')) return 'REVIEW';
+  return 'ALLOW';
+}
+
+class GemsLegalEngineV1 {
+  constructor() {
+    this.registryMap = new Map(ISSUE_REGISTRY_V2.issues.map(issue => [issue.id, issue]));
   }
-};
 
-const ROUTE_MAP = {
-  standard_employee: "MONTHLY",
-  hourly_shift: "HOURLY",
-  senior_management: "EXECUTIVE",
-  contractor_b2b: "CONTRACTOR"
-};
+  evaluate(state) {
+    const severities = [];
+    const issues = [];
+    const clauseActions = [];
 
-const state = {
-  currentStep: 0,
-  answers: {}
-};
+    if (!state.basics.route || !state.basics.name || !state.basics.jobTitle || state.compensation.salary <= 0) {
+      return { gateStatus: "INIT", issues: [], clauseActions: [] };
+    }
+
+    LEGAL_MATRIX_V2.rules.forEach(rule => {
+      if (!rule.route_scope.includes(state.basics.route)) return;
+      const hasFields = rule.required_fields.every(path => {
+        const parts = path.split('.');
+        let val = state;
+        for (let p of parts) {
+          if (val === undefined || val === null) return false;
+          val = val[p];
+        }
+        return val !== undefined && val !== null && val !== '';
+      });
+      if (!hasFields) return;
+
+      if (rule.applies_if(state) && rule.condition(state)) {
+        rule.actions.forEach(action => {
+          if (action.type === "ADD_ISSUE") {
+            const issueDef = this.registryMap.get(action.target);
+            if (issueDef) {
+              issues.push(issueDef);
+              severities.push(issueDef.severity);
+            }
+          }
+          if (action.type === "ADD_CLAUSE") clauseActions.push({ action: "ADD", clauseId: action.target });
+          if (action.type === "REMOVE_CLAUSE") clauseActions.push({ action: "REMOVE", clauseId: action.target });
+        });
+      }
+    });
+
+    return {
+      gateStatus: resolveGateStatus(severities),
+      issues,
+      clauseActions
+    };
+  }
+}
+
+const canonicalEngine = new GemsLegalEngineV1();
+const uiState = { currentStep: 0, answers: {} };
 
 const QUESTION_SCHEMA = [
-  {id:"route_profile", title:"סוג הסכם", type:"choice", required:true, help:"בחר את המסלול האמיתי. זה קובע את כל הזרימה.", options:[
-    {value:"standard_employee", label:"עובד/ת חודשי/ת"},
-    {value:"hourly_shift", label:"עובד/ת שעתי/ת"},
-    {value:"senior_management", label:"מנהל/ת בכיר/ה"},
-    {value:"contractor_b2b", label:"קבלן / B2B"}
+  { id: "route", title: "סוג התקשרות", type: "choice", required: true, hint: "בחר את המסלול המשפטי האמיתי של ההתקשרות.", options: [
+    { value: "MONTHLY", label: "עובד חודשי" },
+    { value: "HOURLY", label: "עובד שעתי" },
+    { value: "EXECUTIVE", label: "בכיר / משרת אמון" },
+    { value: "CONTRACTOR", label: "קבלן / B2B" }
   ]},
-  {id:"employee_name", title:"שם", type:"text", required:true, help:"שם הצד המועסק כפי שיופיע בהסכם."},
-  {id:"role.jobTitle", title:"תפקיד", type:"text", required:true, help:"תיאור קצר ומדויק של התפקיד."},
-  {id:"compensation.baseSalary", title:"שכר בסיס חודשי (₪)", type:"number", required:true, help:"הזן שכר חודשי ברוטו.", show_if:{route_profile:["standard_employee","senior_management"]}},
-  {id:"compensation.hourlyRate", title:"תעריף שעתי (₪)", type:"number", required:true, help:"הזן שכר לשעה.", show_if:{route_profile:["hourly_shift"]}},
-  {id:"contractor.rate", title:"תעריף קבלן (₪)", type:"number", required:true, help:"הזן את התמורה לקבלן.", show_if:{route_profile:["contractor_b2b"]}},
-  {id:"scope_percent", title:"היקף משרה / היקף עבודה", type:"range", required:true, help:"קבע היקף מדויק מ־0% עד 100%."},
-  {id:"compensation.overtimeMode", title:"מודל שעות נוספות", type:"choice", required:false, help:"גלובלי אסור במסלול שעתי.", show_if:{route_profile:["standard_employee","hourly_shift","senior_management"]}, options:[
-    {value:"regular", label:"רגיל"},
-    {value:"global", label:"גלובלי"}
-  ]},
-  {id:"social.existingPensionArrangement", title:"פנסיית חובה?", type:"boolean", required:true, help:"לשכיר חובה להסדיר פנסיה.", show_if:{route_profile:["standard_employee","hourly_shift","senior_management"]}},
-  {id:"social.section14Requested", title:"סעיף 14?", type:"boolean", required:false, help:"רק אם מבוקש ומגובה במדיניות.", show_if:{route_profile:["standard_employee","senior_management"]}},
-  {id:"add.ipSensitive", title:"קניין רוחני / IP?", type:"boolean", required:false, help:"הפעל אם יש צורך בסעיף IP.", show_if:{route_profile:["standard_employee","senior_management","contractor_b2b"]}},
-  {id:"add.nonCompete", title:"הגבלת עיסוק?", type:"boolean", required:false, help:"הפעל רק אם יש בסיס אמיתי.", show_if:{route_profile:["senior_management","contractor_b2b","standard_employee"]}}
+  { id: "name", title: "שם העובד/קבלן", type: "text", required: true, hint: "שם מלא כפי שיופיע בהסכם." },
+  { id: "jobTitle", title: "הגדרת תפקיד", type: "text", required: true, hint: "תיאור תפקיד קצר ומדויק." },
+  { id: "salary", title: "שכר בסיס / תעריף (₪)", type: "number", required: true, hint: "הזן את שכר הבסיס או התעריף השעתי." },
+  { id: "scope", title: "היקף משרה (%)", type: "choice", required: true, hint: "בשלב זה התמיכה היא 50% או 100%.", options: [
+    { value: "100", label: "מלאה (100%)" },
+    { value: "50", label: "חלקית (50%)" }
+  ], show_if: { route: ["MONTHLY", "CONTRACTOR"] }},
+  { id: "overtime", title: "מודל שעות נוספות", type: "choice", required: true, hint: "הגדר האם מדובר בתשלום בפועל או במודל גלובלי.", options: [
+    { value: "ACTUAL", label: "לפי חוק (בפועל)" },
+    { value: "GLOBAL", label: "תמורה גלובלית" }
+  ], show_if: { route: ["MONTHLY", "HOURLY", "EXECUTIVE"] }},
+  { id: "pension", title: "הפרשות פנסיה", type: "boolean", required: true, hint: "חובה במסלול עובד.", show_if: { route: ["MONTHLY", "HOURLY", "EXECUTIVE"] }},
+  { id: "sec14", title: "החלת סעיף 14 (פיצויים)?", type: "boolean", required: false, hint: "רלוונטי למסלולים חודשיים ובכירים.", show_if: { route: ["MONTHLY", "EXECUTIVE"] }}
 ];
 
-function getVisibleSchema(){
-  const route = state.answers['route_profile'];
-  return QUESTION_SCHEMA.filter(q => !q.show_if || q.show_if.route_profile.includes(route));
+const CLAUSE_TEXT_REGISTRY = {
+  PREAMBLE: "הואיל והמעסיק מעוניין להעסיק את העובד, הכל בתנאים המפורטים להלן;",
+  PARTIES: 'הסכם זה נערך ביום {{date}} בין החברה לבין {{name}}.',
+  POSITION_DYNAMIC: 'מועסק בתפקיד {{jobTitle}} בהיקף של {{scope}}%.',
+  WAGE_DYNAMIC: 'התמורה הינה בסך {{salary}} ₪.',
+  OVERTIME_GLOBAL: 'תשולם תוספת גלובלית בגין שעות נוספות כחוק.',
+  TRUST_CLAUSE: 'משרת אמון כמשמעותה בחוק שעות עבודה ומנוחה.',
+  PENSION_MANDATORY: 'החברה תפריש לביטוח פנסיוני מקיף כקבוע בצו ההרחבה.',
+  SEC_14: 'על הפרשות המעסיק יחולו הוראות סעיף 14 לחוק פיצויי פיטורים.'
+};
+
+function getVisibleSchema() {
+  const r = uiState.answers.route;
+  return QUESTION_SCHEMA.filter(q => !q.show_if || (q.show_if.route && q.show_if.route.includes(r)));
 }
 
-function currentQuestion(){
-  return getVisibleSchema()[state.currentStep];
-}
-
-function isFilled(question, value){
-  if(question.type === 'boolean') return value === true || value === false;
-  if(question.type === 'number' || question.type === 'range') return value !== '' && value !== null && value !== undefined && !Number.isNaN(Number(value));
-  return String(value ?? '').trim() !== '';
-}
-
-function validateCurrentQuestion(){
-  const q = currentQuestion();
-  if(!q) return {ok:true, message:''};
-  const val = state.answers[q.id];
-  if(q.required && !isFilled(q, val)){
-    return {ok:false, message:'זהו שדה חובה. לא ניתן להתקדם בלי להשלים אותו.'};
-  }
-  return {ok:true, message:''};
-}
-
-function showValidation(message=''){
-  const box = document.getElementById('validationBox');
-  box.textContent = message;
-  box.classList.toggle('show', !!message);
-}
-
-function buildState(){
-  const raw = state.answers;
-  const routeProfile = raw['route_profile'] || null;
-  const route = ROUTE_MAP[routeProfile] || null;
-
-  let salary = 0;
-  if(route === 'HOURLY') salary = Number(raw['compensation.hourlyRate']) || 0;
-  else if(route === 'CONTRACTOR') salary = Number(raw['contractor.rate']) || 0;
-  else salary = Number(raw['compensation.baseSalary']) || 0;
-
-  const scope = Math.max(0, Math.min(100, Number(raw['scope_percent']) || 0));
-
+function buildContractState() {
+  const ans = uiState.answers;
   return {
-    name: raw['employee_name'] || '',
-    jobTitle: raw['role.jobTitle'] || '',
-    routeProfile,
-    route,
-    salary,
-    scope,
-    overtime: raw['compensation.overtimeMode'] || 'regular',
-    hasNonCompete: !!raw['add.nonCompete'],
-    hasPension: raw['social.existingPensionArrangement'] === true,
-    applySec14: !!raw['social.section14Requested'],
-    hasIP: !!raw['add.ipSensitive']
+    basics: { route: ans.route, name: ans.name, jobTitle: ans.jobTitle },
+    compensation: { salary: Number(ans.salary) || 0 },
+    employment: { scopePercent: Number(ans.scope) || 100 },
+    hours: { overtimeModel: ans.overtime || 'ACTUAL' },
+    social: {
+      pensionEnabled: ans.pension !== undefined ? ans.pension : true,
+      applySec14: !!ans.sec14
+    },
+    protections: { hasNC: false, hasIP: false },
+    classification: { trustJustification: null }
   };
 }
 
-const LEGAL_MATRIX_RULES = [
-  {
-    id:"RULE_REQUIRED_CORE_FIELDS",
-    severity:"INIT",
-    eval:(s)=> !s.routeProfile || !s.route || !s.name || !s.jobTitle || !(s.salary > 0) || !(s.scope > 0),
-    issue:{ code:"INIT", msg:"השלם מסלול, שם, תפקיד, שכר והיקף עבודה לפני הפעלה מלאה של המנוע." }
-  },
-  {
-    id:"RULE_MIN_WAGE_MONTHLY",
-    severity:"BLOCK",
-    eval:(s)=> s.route !== "HOURLY" && s.route !== "CONTRACTOR" && s.salary > 0 && s.scope > 0 && s.salary < (SYSTEM_CONSTANTS.MIN_WAGE_MONTHLY * (s.scope/100)),
-    issue:{ code:"BLOCK", msg:"שכר חודשי מתחת למינימום יחסי. חובה לתקן סכום או היקף." }
-  },
-  {
-    id:"RULE_MIN_WAGE_HOURLY",
-    severity:"BLOCK",
-    eval:(s)=> s.route === "HOURLY" && s.salary > 0 && s.salary < SYSTEM_CONSTANTS.MIN_WAGE_HOURLY,
-    issue:{ code:"BLOCK", msg:"תעריף שעתי נמוך משכר המינימום בחוק." }
-  },
-  {
-    id:"RULE_GLOBAL_OVERTIME_HOURLY",
-    severity:"BLOCK",
-    eval:(s)=> s.route === "HOURLY" && s.overtime === "global",
-    issue:{ code:"BLOCK", msg:"לא ניתן להחיל שעות נוספות גלובליות על עובד שעתי." }
-  },
-  {
-    id:"RULE_MISSING_PENSION",
-    severity:"FIX_REQUIRED",
-    eval:(s)=> s.route !== "CONTRACTOR" && s.route !== null && s.name && s.jobTitle && s.salary > 0 && s.scope > 0 && s.hasPension === false,
-    issue:{ code:"FIX_REQUIRED", msg:"חובה להגדיר הסדר פנסיוני לעובד שכיר." }
-  },
-  {
-    id:"RULE_FULLTIME_CONTRACTOR",
-    severity:"REVIEW",
-    eval:(s)=> s.route === "CONTRACTOR" && s.scope >= 90,
-    issue:{ code:"REVIEW", msg:"היקף גבוה מאוד לקבלן מעלה חשש לסיווג כעובד. נדרש מעבר עו״ד." }
-  },
-  {
-    id:"RULE_LOW_WAGE_NON_COMPETE",
-    severity:"REVIEW",
-    eval:(s)=> s.hasNonCompete === true && s.salary > 0 && s.salary < (SYSTEM_CONSTANTS.MIN_WAGE_MONTHLY * 1.5) && s.route !== "CONTRACTOR",
-    issue:{ code:"REVIEW", msg:"אי־תחרות בשכר נמוך בסבירות גבוהה לא תיאכף." }
-  }
-];
-
-function evaluate(s){
-  let result = { gate:"ALLOW", issues:[], schema:[] };
-
-  if (!s.routeProfile || !s.route) {
-    result.gate = "INIT";
-    return result;
-  }
-
-  for(const rule of LEGAL_MATRIX_RULES){
-    if(rule.eval(s)){
-      result.issues.push(rule.issue);
-      if(rule.severity === 'INIT'){
-        result.gate = 'INIT';
-        return result;
-      }
-      if(rule.severity === 'BLOCK') result.gate = 'BLOCK';
-      else if(rule.severity === 'FIX_REQUIRED' && result.gate !== 'BLOCK') result.gate = 'FIX_REQUIRED';
-      else if(rule.severity === 'REVIEW' && result.gate !== 'BLOCK' && result.gate !== 'FIX_REQUIRED') result.gate = 'REVIEW';
-    }
-  }
-
-  if(result.gate === 'ALLOW'){
-    const routeMap = CLAUSE_DEPENDENCY_MAP.routes[s.route] || CLAUSE_DEPENDENCY_MAP.routes.MONTHLY;
-    result.schema = [...routeMap.mandatory];
-    if(s.overtime === 'global' && s.route !== 'HOURLY') result.schema.push('OVERTIME_GLOBAL');
-    if(s.applySec14) result.schema.push('SEC_14');
-    if(s.hasIP){ result.schema.push('IP_ASSIGNMENT'); result.schema.push('CONFIDENTIALITY'); }
-    if(s.hasNonCompete) result.schema.push('NON_COMPETE');
-  }
-
-  return result;
-}
-
-function nextHash(){
-  return 'GEMS_' + Math.random().toString(36).slice(2,10).toUpperCase();
-}
-
-function smartPatch(patch){
-  Object.assign(state.answers, patch);
-  if(patch.route_profile){
-    const keep = { route_profile: patch.route_profile };
-    state.answers = { ...state.answers, ...keep };
-  }
-  if(state.currentStep > getVisibleSchema().length - 1) state.currentStep = getVisibleSchema().length - 1;
-  render();
-}
-
-function fillClauseText(id, s){
-  return (CLAUSE_REGISTRY[id] || '')
-    .replace(/\{\{name\}\}/g, `<strong class="hl">${s.name || '___'}</strong>`)
-    .replace(/\{\{salary\}\}/g, `<strong class="money">${Number(s.salary || 0).toLocaleString('he-IL')}</strong>`)
-    .replace(/\{\{jobTitle\}\}/g, `<strong class="hl">${s.jobTitle || '___'}</strong>`)
-    .replace(/\{\{scope\}\}/g, `<strong class="hl">${s.scope || 0}</strong>`)
+function fillText(id, state) {
+  return (CLAUSE_TEXT_REGISTRY[id] || '')
+    .replace(/\{\{name\}\}/g, `<span class="hl">${state.basics.name || '___'}</span>`)
+    .replace(/\{\{salary\}\}/g, `<span class="hl">${state.compensation.salary || '___'}</span>`)
+    .replace(/\{\{jobTitle\}\}/g, `<span class="hl">${state.basics.jobTitle || '___'}</span>`)
+    .replace(/\{\{scope\}\}/g, `<span class="hl">${state.employment.scopePercent || '___'}</span>`)
     .replace(/\{\{date\}\}/g, new Date().toLocaleDateString('he-IL'));
 }
 
-function renderInput(step){
-  const val = state.answers[step.id];
-  if(step.type === 'choice'){
-    return `<div class="route-grid">${step.options.map(o => `<button class="route-btn ${val===o.value?'active':''}" data-q="${step.id}" data-v="${o.value}">${o.label}</button>`).join('')}</div>`;
-  }
-  if(step.type === 'boolean'){
-    return `<div class="binary-grid">
-      <button class="pill-toggle ${val===true?'active':''}" data-q="${step.id}" data-bool="true">כן</button>
-      <button class="pill-toggle ${val===false?'active':''}" data-q="${step.id}" data-bool="false">לא</button>
-    </div>`;
-  }
-  if(step.type === 'range'){
-    const value = Number(val ?? 100);
-    return `<div class="range-wrap">
-      <div class="range-top"><span>היקף</span><span class="range-val">${value}%</span></div>
-      <input id="fieldRange" data-q="${step.id}" type="range" min="0" max="100" step="1" value="${value}">
-      <div style="margin-top:10px"><input class="num-input" id="fieldInput" data-q="${step.id}" type="number" min="0" max="100" value="${value}"></div>
-    </div>`;
-  }
-  return `<input class="${step.type==='number'?'num-input':'input'}" id="fieldInput" data-q="${step.id}" type="${step.type}" value="${val ?? ''}" />`;
+function validateCurrentStep() {
+  const step = getVisibleSchema()[uiState.currentStep];
+  if (!step || !step.required) return { ok: true, msg: '' };
+  const v = uiState.answers[step.id];
+  if (v === undefined || v === null || v === '') return { ok: false, msg: 'זה שדה חובה כדי להתקדם.' };
+  return { ok: true, msg: '' };
 }
 
-function renderStateBox(s, result){
-  const entries = [
-    ['Route', s.route || '—'],
-    ['Name', s.name || '—'],
-    ['Role', s.jobTitle || '—'],
-    ['Salary', s.salary ? `${s.salary} ₪` : '—'],
-    ['Scope', s.scope ? `${s.scope}%` : '—'],
-    ['Pension', s.hasPension ? 'כן' : 'לא'],
-    ['Overtime', s.overtime || '—'],
-    ['Gate', result.gate]
-  ];
-  document.getElementById('stateBox').innerHTML = entries.map(([k,v]) => `
-    <div class="state-item">
-      <div class="k">${k}</div>
-      <div class="v">${v}</div>
-    </div>
-  `).join('');
+function renderLeft(step, schema) {
+  document.getElementById('stepMeta').textContent = `שלב ${uiState.currentStep + 1} מתוך ${schema.length}`;
+  document.getElementById('stepTitle').textContent = step ? step.title : '';
+  document.getElementById('fieldHint').textContent = step?.hint || '';
+  document.getElementById('prevBtn').disabled = uiState.currentStep === 0;
+
+  const validation = validateCurrentStep();
+  document.getElementById('validationMsg').textContent = validation.msg;
+  document.getElementById('nextBtn').disabled = !validation.ok || uiState.currentStep === schema.length - 1;
+  document.getElementById('dots').innerHTML = schema.map((_, i) => `<span class="dot ${i === uiState.currentStep ? 'active' : ''}"></span>`).join('');
+
+  if (!step) return;
+  const val = uiState.answers[step.id];
+  let html = '';
+
+  if (step.type === 'choice') {
+    const two = step.options.length === 2 ? 'two' : '';
+    html = `<div class="choice-grid ${two}">${step.options.map(o => `<button class="choice-btn ${String(val) === String(o.value) ? 'active' : ''}" onclick="chooseValue('${step.id}','${o.value}')">${o.label}</button>`).join('')}</div>`;
+  } else if (step.type === 'boolean') {
+    html = `<div class="binary-wrap"><button class="binary-btn ${val === true ? 'active' : ''}" onclick="chooseBool('${step.id}', true)">כן</button><button class="binary-btn ${val === false ? 'active' : ''}" onclick="chooseBool('${step.id}', false)">לא</button></div>`;
+  } else {
+    const cls = step.type === 'number' ? 'num-input' : 'text-input';
+    html = `<input id="liveInput" class="${cls}" type="${step.type}" value="${val ?? ''}" placeholder="הזן ערך...">`;
+  }
+  document.getElementById('fieldBox').innerHTML = html;
+
+  const input = document.getElementById('liveInput');
+  if (input) {
+    input.addEventListener('input', (e) => {
+      const value = step.type === 'number' ? e.target.value : e.target.value;
+      uiState.answers[step.id] = value;
+      renderDynamicOnly();
+    });
+  }
 }
 
-function renderIssues(result){
-  const box = document.getElementById('issuesBox');
-  const guidanceBox = document.getElementById('guidanceBox');
-
-  if(!result.issues.length){
-    box.innerHTML = `<div class="safe">✔ הנתונים תקינים לפי חוקי המנוע בשלב זה.</div>`;
-    guidanceBox.innerHTML = '';
-    return;
-  }
-
-  box.innerHTML = result.issues.map(i => `
-    <div class="issue ${i.code === 'REVIEW' ? 'review' : i.code === 'BLOCK' ? 'block' : 'fix'}">
-      <div class="issue-meta">${i.code}</div>
-      <p>${i.msg}</p>
-    </div>
-  `).join('');
-
-  const guidance = result.issues.map(i => `• ${i.msg}`).join('<br>');
-  guidanceBox.innerHTML = `<div class="guidance"><strong>יש לתקן / לבדוק עכשיו:</strong><br>${guidance}</div>`;
-}
-
-function renderSchema(result){
-  const box = document.getElementById('schemaBox');
-  if(result.gate !== 'ALLOW'){
-    box.innerHTML = `<div class="safe" style="background:#f8fafc;border-color:#e2e8f0;color:#475569">הסכמה לא נבנית כל עוד הסטטוס אינו ALLOW.</div>`;
-    return;
-  }
-  box.innerHTML = result.schema.map(id => `<div class="schema-pill">${id}</div>`).join('');
-}
-
-function renderPaper(s, result){
-  const paper = document.getElementById('paper');
-  if(result.gate !== 'ALLOW'){
-    paper.innerHTML = `
-      <div class="ghost">
-        <div class="ghost-icon">⚖️</div>
-        <h2>ההסכם עדיין נעול</h2>
-        <p>השלם או תקן את הנתונים לפי הערות המערכת. חוזה משתחרר רק כאשר הסטטוס הוא ALLOW.</p>
-      </div>
-    `;
-    return;
-  }
-  paper.innerHTML = `
-    <h2 class="contract-title">הסכם העסקה</h2>
-    <div class="clauses">
-      ${result.schema.filter(id => id !== 'TITLE').map(id => `<div class="clause">${fillClauseText(id, s)}</div>`).join('')}
-    </div>
-  `;
-}
-
-function bindInputs(){
-  const fi = document.getElementById('fieldInput');
-  const fr = document.getElementById('fieldRange');
-
-  if(fi){
-    fi.oninput = e => {
-      const q = e.target.dataset.q;
-      const raw = e.target.value;
-      const value = e.target.type === 'number'
-        ? (raw === '' ? '' : Number(raw))
-        : raw;
-      state.answers[q] = value;
-      showValidation('');
-      const previewState = buildState();
-      const previewResult = evaluate(previewState);
-      renderStateBox(previewState, previewResult);
-      renderIssues(previewResult);
-      renderSchema(previewResult);
-      renderPaper(previewState, previewResult);
-      document.getElementById('gateText').textContent = previewResult.gate;
-      document.getElementById('gateLight').className = 'gate-light ' + ({
-        INIT:'gate-init', ALLOW:'gate-allow', BLOCK:'gate-block', REVIEW:'gate-review', FIX_REQUIRED:'gate-fix'
-      }[previewResult.gate]);
-      const relBtn = document.getElementById('releaseBtn');
-      relBtn.className = 'release-btn ' + (previewResult.gate === 'ALLOW' ? 'allow' : previewResult.gate === 'REVIEW' ? 'review' : 'block');
-      relBtn.disabled = (previewResult.gate !== 'ALLOW');
-      relBtn.textContent =
-        previewResult.gate === 'ALLOW' ? 'הפקת הסכם' :
-        previewResult.gate === 'REVIEW' ? 'נדרש מעבר עו״ד' :
-        previewResult.gate === 'FIX_REQUIRED' ? 'נדרש תיקון נתונים' :
-        previewResult.gate === 'BLOCK' ? 'חסימה משפטית' : 'ממתין לנתונים';
-    };
-    fi.onchange = e => {
-      const q = e.target.dataset.q;
-      const raw = e.target.value;
-      const value = e.target.type === 'number'
-        ? (raw === '' ? '' : Number(raw))
-        : raw;
-      smartPatch({ [q]: value });
-    };
-  }
-
-  if(fr){
-    fr.oninput = e => {
-      const q = e.target.dataset.q;
-      const value = Number(e.target.value);
-      state.answers[q] = value;
-      const numericInput = document.getElementById('fieldInput');
-      if(numericInput && numericInput !== e.target) numericInput.value = value;
-      document.querySelector('.range-val').textContent = value + '%';
-      const previewState = buildState();
-      const previewResult = evaluate(previewState);
-      renderStateBox(previewState, previewResult);
-      renderIssues(previewResult);
-      renderSchema(previewResult);
-      renderPaper(previewState, previewResult);
-      document.getElementById('gateText').textContent = previewResult.gate;
-      document.getElementById('gateLight').className = 'gate-light ' + ({
-        INIT:'gate-init', ALLOW:'gate-allow', BLOCK:'gate-block', REVIEW:'gate-review', FIX_REQUIRED:'gate-fix'
-      }[previewResult.gate]);
-    };
-    fr.onchange = e => smartPatch({ [e.target.dataset.q]: Number(e.target.value) });
-  }
-
-  document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => {
-    smartPatch({ [b.dataset.q]: b.dataset.v });
-  });
-  document.querySelectorAll('[data-bool]').forEach(b => b.onclick = () => {
-    smartPatch({ [b.dataset.q]: b.dataset.bool === 'true' });
-  });
-}
-
-function render(){
-  const schema = getVisibleSchema();
-  const step = schema[state.currentStep];
-  const s = buildState();
-  const result = evaluate(s);
-
-  document.getElementById('stepMeta').textContent = `Step ${schema.length ? state.currentStep + 1 : 0} of ${schema.length}`;
-  document.getElementById('stepTitle').textContent = step ? step.title : 'סיום';
-  document.getElementById('fieldBox').innerHTML = step ? renderInput(step) : '';
-  document.getElementById('fieldHelp').textContent = step?.help || '';
-  document.getElementById('dots').innerHTML = schema.map((_,i)=>`<span class="dotbar ${i===state.currentStep?'active':''}"></span>`).join('');
-  document.getElementById('prevBtn').disabled = state.currentStep === 0;
-  document.getElementById('nextBtn').disabled = state.currentStep >= schema.length - 1;
-  document.getElementById('hashText').textContent = nextHash();
-
-  document.getElementById('gateText').textContent = result.gate;
-  document.getElementById('gateLight').className = 'gate-light ' + ({
-    INIT:'gate-init', ALLOW:'gate-allow', BLOCK:'gate-block', REVIEW:'gate-review', FIX_REQUIRED:'gate-fix'
-  }[result.gate]);
+function renderOutputs(evalResult, contractState) {
+  const badge = document.getElementById('gateBadge');
+  badge.textContent = evalResult.gateStatus;
+  badge.className = `badge ${evalResult.gateStatus}`;
 
   const relBtn = document.getElementById('releaseBtn');
-  relBtn.className = 'release-btn ' + (result.gate === 'ALLOW' ? 'allow' : result.gate === 'REVIEW' ? 'review' : 'block');
-  relBtn.disabled = (result.gate !== 'ALLOW');
-  relBtn.textContent =
-    result.gate === 'ALLOW' ? 'הפקת הסכם' :
-    result.gate === 'REVIEW' ? 'נדרש מעבר עו״ד' :
-    result.gate === 'FIX_REQUIRED' ? 'נדרש תיקון נתונים' :
-    result.gate === 'BLOCK' ? 'חסימה משפטית' : 'ממתין לנתונים';
+  relBtn.className = `action-btn ${evalResult.gateStatus === 'ALLOW' ? 'allow' : evalResult.gateStatus === 'REVIEW' ? 'review' : 'block'}`;
+  relBtn.disabled = evalResult.gateStatus !== 'ALLOW';
+  relBtn.textContent = evalResult.gateStatus === 'ALLOW' ? 'הפקת הסכם סופי' : evalResult.gateStatus === 'REVIEW' ? 'ממתין לאישור עו״ד' : evalResult.gateStatus === 'INIT' ? 'השלם נתוני ליבה' : 'חסום: נדרש תיקון';
 
-  document.getElementById('traceMain').textContent = `Status: ${result.gate}`;
-  document.getElementById('traceMini').textContent = result.issues[0]?.msg || 'אין כרגע טריגרים פעילים.';
+  const helper = document.getElementById('gateHelp');
+  if (evalResult.gateStatus === 'ALLOW') helper.textContent = 'המערכת מאשרת הפקה. אפשר להמשיך למסמך.';
+  else if (evalResult.gateStatus === 'REVIEW') helper.textContent = 'קיימת חשיפה שמחייבת אישור עו״ד לפני הפקה.';
+  else if (evalResult.gateStatus === 'FIX_REQUIRED') helper.textContent = 'יש נתון חובה/תיקון נדרש לפני הפקה.';
+  else if (evalResult.gateStatus === 'BLOCK') helper.textContent = 'המערכת זיהתה חסם משפטי קשיח.';
+  else helper.textContent = 'המנוע הקנוני יכריע אחרי השלמת נתוני הליבה.';
 
-  renderStateBox(s, result);
-  renderIssues(result);
-  renderSchema(result);
-  renderPaper(s, result);
-  bindInputs();
-  showValidation('');
+  const issuesWrap = document.getElementById('issuesWrap');
+  if (!evalResult.issues.length) {
+    issuesWrap.innerHTML = `<div class="ok-box">אין כרגע issues פעילים</div>`;
+  } else {
+    issuesWrap.innerHTML = `<div class="issues-list">${evalResult.issues.map(i => `
+      <div class="issue ${i.severity}">
+        <div class="issue-title">${i.severity === 'BLOCK' ? '⛔' : i.severity === 'REVIEW' ? '⚠️' : '🔧'} ${i.title}</div>
+        <div class="issue-summary">${i.summary}</div>
+        <div class="issue-resolution">מה לתקן עכשיו: ${i.resolution_path}</div>
+      </div>
+    `).join('')}</div>`;
+  }
+
+  document.getElementById('stateWrap').innerHTML = `
+    <div class="state-grid">
+      <div class="kv"><div class="k">מסלול</div><div class="v">${contractState.basics.route || '—'}</div></div>
+      <div class="kv"><div class="k">שכר/תעריף</div><div class="v">${contractState.compensation.salary || '—'}</div></div>
+      <div class="kv"><div class="k">היקף</div><div class="v">${contractState.employment.scopePercent || '—'}%</div></div>
+      <div class="kv"><div class="k">פנסיה</div><div class="v">${contractState.social.pensionEnabled === true ? 'כן' : contractState.social.pensionEnabled === false ? 'לא' : '—'}</div></div>
+      <div class="kv"><div class="k">שעות נוספות</div><div class="v">${contractState.hours.overtimeModel || '—'}</div></div>
+      <div class="kv"><div class="k">סעיף 14</div><div class="v">${contractState.social.applySec14 ? 'כן' : 'לא'}</div></div>
+    </div>
+  `;
+
+  const paper = document.getElementById('paperContainer');
+  if (evalResult.gateStatus === 'ALLOW') {
+    const finalClauses = [];
+    evalResult.clauseActions.forEach(action => {
+      if (action.action === 'ADD' && !finalClauses.includes(action.clauseId)) finalClauses.push(action.clauseId);
+      if (action.action === 'REMOVE') {
+        const idx = finalClauses.indexOf(action.clauseId);
+        if (idx !== -1) finalClauses.splice(idx, 1);
+      }
+    });
+    paper.innerHTML = `
+      <h2 class="doc-title">הסכם העסקה</h2>
+      <div class="clauses">${finalClauses.map(id => `<div class="clause">${fillText(id, contractState)}</div>`).join('')}</div>
+    `;
+  } else {
+    paper.innerHTML = `
+      <div class="empty">
+        <strong>המסמך עדיין נעול</strong>
+        <p>${evalResult.gateStatus === 'INIT' ? 'יש להשלים שם, תפקיד, שכר ומסלול כדי להפעיל את המנוע.' : 'קיימות הערות מערכת הדורשות תיקון או בחינה משפטית לפני הרכבת ההסכם.'}</p>
+      </div>
+    `;
+  }
 }
 
+function renderDynamicOnly() {
+  const contractState = buildContractState();
+  const evalResult = canonicalEngine.evaluate(contractState);
+  const validation = validateCurrentStep();
+  document.getElementById('validationMsg').textContent = validation.msg;
+  document.getElementById('nextBtn').disabled = !validation.ok || uiState.currentStep === getVisibleSchema().length - 1;
+  renderOutputs(evalResult, contractState);
+}
+
+function refreshUI(full = true) {
+  const schema = getVisibleSchema();
+  if (uiState.currentStep >= schema.length) uiState.currentStep = Math.max(0, schema.length - 1);
+  const step = schema[uiState.currentStep];
+  const contractState = buildContractState();
+  const evalResult = canonicalEngine.evaluate(contractState);
+  if (full) renderLeft(step, schema);
+  renderOutputs(evalResult, contractState);
+}
+
+function chooseValue(key, value) {
+  uiState.answers[key] = value;
+  if (key === 'route') {
+    ['scope', 'overtime', 'pension', 'sec14', 'salary'].forEach(k => delete uiState.answers[k]);
+    uiState.currentStep = 0;
+    while (getVisibleSchema()[uiState.currentStep]?.id !== 'name' && uiState.currentStep < getVisibleSchema().length - 1) uiState.currentStep++;
+    refreshUI(true);
+    return;
+  }
+  refreshUI(true);
+}
+
+function chooseBool(key, value) {
+  uiState.answers[key] = value;
+  refreshUI(true);
+}
+
+window.chooseValue = chooseValue;
+window.chooseBool = chooseBool;
+
 document.getElementById('prevBtn').onclick = () => {
-  if(state.currentStep > 0){
-    state.currentStep--;
-    render();
+  if (uiState.currentStep > 0) {
+    uiState.currentStep--;
+    refreshUI(true);
   }
 };
 
 document.getElementById('nextBtn').onclick = () => {
-  const check = validateCurrentQuestion();
-  if(!check.ok){
-    showValidation(check.message);
+  const validation = validateCurrentStep();
+  if (!validation.ok) {
+    document.getElementById('validationMsg').textContent = validation.msg;
     return;
   }
-  if(state.currentStep < getVisibleSchema().length - 1){
-    state.currentStep++;
-    render();
+  if (uiState.currentStep < getVisibleSchema().length - 1) {
+    uiState.currentStep++;
+    refreshUI(true);
   }
 };
 
 document.getElementById('releaseBtn').onclick = () => {
-  const result = evaluate(buildState());
-  if(result.gate === 'ALLOW') window.print();
+  const res = canonicalEngine.evaluate(buildContractState());
+  if (res.gateStatus === 'ALLOW') window.print();
 };
 
-render();
+refreshUI(true);
 </script>
 </body>
 </html>
